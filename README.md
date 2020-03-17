@@ -15,3 +15,10 @@ cd catkin_ws/
 catkin_make
 ```
 
+## To Launch
+```bash
+roslaunch urx_driver init.launch
+```
+Note: launch roscore first in another terminal. 
+
+
