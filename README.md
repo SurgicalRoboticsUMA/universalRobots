@@ -30,8 +30,3 @@ Note: launch roscore first in another terminal.
 
 To make sure that you have are able to communicate your computer with the robot simulator, open URSim UR3 in the virtual machine, then go to 'Setup Robot' and 'Network' and get the robot IP address.
 Then open a terminal (ctrl+alt+T) in your computer abd ping the robot to check the communication. 
-
-
-
-
-```
