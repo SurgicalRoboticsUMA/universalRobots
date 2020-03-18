@@ -22,11 +22,14 @@ roslaunch urx_driver init.launch
 Note: launch roscore first in another terminal. 
 
 ## UR3 Simulator
-* Install a virtual machine. For example, VirtualBox (https://download.virtualbox.org/virtualbox/6.1.4/virtualbox-6.1_6.1.4-136177~Ubuntu~xenial_amd64.deb).
+* Install a virtual machine. For example VMWare (it can be downloadesd from www.sci.uma.es).
 
 * Download URSim 3.5.1 (https://www.universal-robots.com/download/?option=33415#section16597).
 
-* Follow the steps in the previous website depending on the virtual machine you have.
+* Follow the steps on the previous website.
+
+To make sure that you have are able to communicate your computer with the robot simulator, open URSim UR3 in the virtual machine, then go to 'Setup Robot' and 'Network' and get the robot IP address.
+Then open a terminal (ctrl+alt+T) in your computer abd ping the robot to check the communication. 
 
 
 
