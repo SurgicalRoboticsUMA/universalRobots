@@ -32,4 +32,5 @@ To make sure that you have are able to communicate your computer with the robot 
 Then open a terminal (ctrl+alt+T) in your computer and ping the robot to check the communication. 
 
 ![screenshots] (https://github.com/SurgicalRoboticsUMA/universalRobots/blob/master/media/ping_robot.png)
+
 ![screenshots] (https://github.com/SurgicalRoboticsUMA/universalRobots/blob/master/media/robot_ip.png)
