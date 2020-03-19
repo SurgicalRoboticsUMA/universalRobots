@@ -19,7 +19,7 @@ catkin_make
 ```bash
 roslaunch urx_driver init.launch
 ```
-Before launching the node, make sure that your UR3 robot (real robot or simulator) is running, and that you have set the ip address of the robot properly in the launch file. 
+Before launching the node, make sure that your UR3 robot (real robot or simulator) is running, and that you have set the ip address of the robot properly in the launch file. The IP address should be the same of the one displayed in the robot console or simulator. 
 
 ## UR3 Simulator
 * Install a virtual machine. For example VMWare (it can be downloadesd from www.sci.uma.es).
