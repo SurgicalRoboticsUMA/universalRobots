@@ -9,9 +9,9 @@ sudo apt-get install ros-kinetic-moveit
 ```
 
 ## To build
-Clone package
+Download the package (https://github.com/SurgicalRoboticsUMA/universalRobots.git) and copy it into folder /catkin_ws/src. Then:
 ```bash
-cd catkin_ws/
+cd ~/catkin_ws
 catkin_make
 ```
 
