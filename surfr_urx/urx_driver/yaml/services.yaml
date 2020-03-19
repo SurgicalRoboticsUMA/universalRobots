@@ -1,0 +1,33 @@
+# Valid types for services are:
+#   Empty: No params passed. Additional info can be parsed by 'data' tag.
+#          First field on 'data' array must be the command executed by
+#          the service.
+#   Other: One param required and set by request message. Valid data types
+#          are 'Boolean', 'Unsigned', 'Integer', 'Double', 'String' or
+#          'Vector'. 'data' tag must have at least one field with the
+#          command executed by the service.
+move_home:
+  input: "move_joints"
+  type : "Empty"
+  data : [0.0, -1.57, 0.0, -1.57, 0.0, 0.0]
+move_start:
+  input: "move_joints"
+  type : "Empty"
+  data : [-1.6, -1.7, -2.2, -0.8, 1.6, 6.2]
+move_joints:
+  input: "move_joints"
+  type : "Vector"
+#   data : ["move_joints"]
+move_pose:
+  input: "move_pose"
+  type : "Vector"
+#   data: ["move_pose"]
+enable_freedrive:
+  input: "set_freedrive"
+  type : "Empty"
+#   data: ["set_freedrive"]
+disable_freedrive:
+  input: "set_run"
+  type : "Empty"
+#  data: ["set_run"]
+

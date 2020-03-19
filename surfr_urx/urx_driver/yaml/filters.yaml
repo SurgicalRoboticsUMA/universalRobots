@@ -1,0 +1,5 @@
+# Filters can ONLY be applied to output topics.
+# Valid types for filters can be found at /surfr/filters ROS parameter
+outputs:
+  pose         : "Iir2"
+

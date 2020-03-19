@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="msg_type"           default="std"         doc="Choose between std_msgs and surfr_msgs packages. Valid values: {std|surfr}"/>
+  <arg name="debug"              default="true"        doc="Use debug mode to output detailed runtime info. Valid values: {true|false}" />
+  <arg name="urdf"               default="true"        doc="Visualize virtual environment. Valid values: {true|false}."/>
+  <arg name="simulation"         default="false"       doc="Use only the device simulation mode or both, simulator and real component." />
+  <arg name="id"                 default="1"           doc="Device ID number."/>
+  <arg name="origin_name"        default="world"       doc="Name of the device parent frame."/>
+  <arg name="origin_position"    default="0.0 0.0 0.0" doc="Initial position of the root_link reference frame."/>
+  <arg name="origin_orientation" default="0.0 0.0 0.0" doc="Initial YPR (Euler XYZ) orientation of the root_link reference frame."/>
+  <!-- IMPORTANT: APPLY THE SAME TCP POSE TO THE ROBOT CONTROLLER!!! -->
+  <arg name="tcp_position"       default="0.0 0.0 0.0" doc="Adds a position offset for the Tool Center Point."/>
+  <arg name="tcp_orientation"    default="0.0 0.0 0.0" doc="Adds a orientation offset for the Tool Center Point."/>
+  <arg name="ip"          default="192.168.1.10" doc="IP address to open channel communication. Disabled on simulation mode."/>
+<!-- MUST CREATE 3 LAUNCH FILES FOR EACH ROBOT -->
+
+  <!-- IMPORTANT: The namespace of each node consists of the device model name followed by the '_'
+                  sign and the ID number which labels a particular device. -->
+  <arg name="devid"  value="UR3_$(arg id)"        doc="For internal use, represents the device model and id tag" />
+
+  <!-- ROS PARAMETERS INITIALIZATION -->
+  <include file="$(find surfr_core)/launch/start.launch" />
+  <env name="ROSCONSOLE_FORMAT"
+       value="[${severity}][${node}:${function}:${line}] [${time}]: ${message}" />
+  <env if="$(arg debug)"
+       name="ROSCONSOLE_CONFIG_FILE"
+       value="$(find surfr_core)/config/rosconsole_debug.config" />
+  <env unless="$(arg debug)"
+       name="ROSCONSOLE_CONFIG_FILE"
+       value="$(find surfr_core)/config/rosconsole_nodebug.config" />
+
+  <!-- YAML CONFIGURATION PARAMETERS -->
+  <rosparam ns="$(arg devid)"          command="load" file="$(find urx_driver)/yaml/settings.yaml" />
+  <rosparam ns="$(arg devid)/inputs"   command="load" file="$(find urx_driver)/yaml/inputs.yaml"   />
+  <rosparam ns="$(arg devid)/outputs"  command="load" file="$(find urx_driver)/yaml/outputs.yaml"  />
+  <rosparam ns="$(arg devid)/services" command="load" file="$(find urx_driver)/yaml/services.yaml" />
+  <rosparam ns="$(arg devid)/filters"  command="load" file="$(find urx_driver)/yaml/filters.yaml"  />
+  <rosparam ns="$(arg devid)/planners" command="load" file="$(find urx_driver)/yaml/planners.yaml" />
+  <rosparam ns="$(arg devid)" subst_value="true">
+    debug     : $(arg debug)
+    msg_type  : $(arg msg_type)
+    origin: {position   : $(arg origin_position),
+             orientation: $(arg origin_orientation),
+             parent     : $(arg origin_name),
+             child      : "$(arg devid)/root_link"}
+    tcp: {position   : $(arg tcp_position),
+          orientation: $(arg tcp_orientation),
+          parent     : "$(arg devid)/ee_link",
+          child      : "$(arg devid)/tcp_link"}
+  </rosparam>
+  <rosparam unless="$(arg simulation)" ns="$(arg devid)" subst_value="true">
+    sockets   :
+      ip         : '$(arg ip)'
+      port_gui   : '29999'
+      port_in    : '30002'
+      port_out   : '30003'
+      packet_size: 1060
+  </rosparam>
+
+<!-- MoveIt! for Universal Robots UR3 -->
+  <!-- Select the simulation or real mode -->
+  <param name="$(arg devid)/simulation" type="bool" value="$(arg simulation)" />
+  <!-- Load the Universal Robot Description Format (URDF) -->
+  <param name="$(arg devid)/urdf/model" command="$(find xacro)/xacro --inorder '$(find urx_driver)/urdf/ur3_robot.urdf.xacro' origin_name:='$(arg origin_name)' origin_position:='$(arg origin_position)' origin_orientation:='$(arg origin_orientation)' tcp_position:='$(arg tcp_position)' tcp_orientation:='$(arg tcp_orientation)' prefix:='$(arg devid)'"/>
+  <!-- Load the Semantic Robot Description Format (SRDF) -->
+  <param name="$(arg devid)/urdf/model_semantic" command="$(find xacro)/xacro --inorder '$(find urx_driver)/urdf/ur3.srdf' prefix:='$(arg devid)' origin:='$(arg origin_name)'"/>
+  <!-- Load updated joint limits (override information from URDF) -->
+  <group ns="$(arg devid)/urdf/model_planning">
+    <rosparam command="load" file="$(find ur3_moveit)/config/joint_limits.yaml"/>
+  </group>
+  <!-- Load default settings for kinematics; these settings are overridden by settings in a node's namespace -->
+  <group ns="$(arg devid)/urdf/model_kinematics/$(arg devid)_arm">
+<!--    <rosparam command="load" file="$(find ur3_moveit)/config/kinematics.yaml"/>-->
+    <rosparam command="load" file="$(find urx_driver)/yaml/kinematics.yaml"/>
+  </group>
+
+<!-- Run Node -->
+  <!-- Nodelet Manager -->
+  <node pkg="nodelet" type="nodelet" name="$(arg devid)_nodelet" args="manager" output="screen">
+    <remap from="$(arg devid)_nodelet/bond" to="$(arg devid)/nodelet/bond" />
+  </node>
+  <node     if="$(arg debug)" name="$(arg devid)" pkg="nodelet" type="nodelet" output="screen" args="load surfr/Nodelet $(arg devid)_nodelet --debug __class=DeviceURx" required="true">
+    <remap from="$(arg devid)_nodelet/bond" to="$(arg devid)/nodelet/bond" />
+  </node>
+  <node unless="$(arg debug)" name="$(arg devid)" pkg="nodelet" type="nodelet" output="screen" args="load surfr/Nodelet $(arg devid)_nodelet --nodebug __class=DeviceURx" required="true">
+    <remap from="$(arg devid)_nodelet/bond" to="$(arg devid)/nodelet/bond" />
+  </node>
+
+<!-- RViz Simulator -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find urx_driver)/urdf/urx.rviz" ns="$(arg devid)">
+    <remap from="robot_description" to="urdf/model" />
+  </node>
+  <!-- For simulation mode only. Load of a GUI to manipulate the joint values -->
+  <node if="$(arg simulation)" name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+    <param name="use_gui" value="true"/>
+    <remap from="robot_description" to="$(arg devid)/urdf/model" />
+    <remap from="joint_states" to="$(arg devid)/inputs/move_joints" />
+  </node>
+</launch>

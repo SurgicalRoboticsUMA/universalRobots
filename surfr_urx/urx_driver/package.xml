@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>urx_driver</name>
+  <version>0.2.0</version>
+  <description>
+    This package includes all the basics to integrate the Universal Robots
+    manipulators in ROS. The device drivers are programmed as a C++ class
+    into the Surgical Framework (SurFr), and compiled as a dynamic libraries
+    by the surfr_core package. Tts execution consists of three steps:
+
+    1. The driver properties are loaded from .yaml files.
+    2. The driver outputs are published as ROS topics, whereas the inputs are
+       subscribed by ROS callbacks.
+    3. Specific orders can be commanded as ROS services.
+
+    See documentation for more information related to the standard format for
+    programming a SurFr class.
+  </description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag --> 
+  <maintainer email="ebauzano@uma.es">Enrique Bauzano</maintainer>
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <license>TODO</license>
+
+
+  <!-- Url tags are optional, but mutiple are allowed, one per tag -->
+  <!-- Optional attribute type can be: website, bugtracker, or repository -->
+  <url type="website">http://www.uma.es/medical-robotics</url>
+
+
+  <!-- Author tags are optional, mutiple are allowed, one per tag -->
+  <!-- Authors do not have to be maintianers, but could be -->
+  <author email="ebauzano@uma.es">Enrique Bauzano</author>
+
+
+  <!-- Dependencies can be catkin packages or system dependencies -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <!-- Packages needed at compile and/or run time -->
+  <depend>surfr_msgs</depend>
+  <depend>surfr_core</depend>
+  <depend>cmake_modules</depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+    <surfr_core plugin="${prefix}/device_plugin.xml" />
+  </export>
+</package>

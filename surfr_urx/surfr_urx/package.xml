@@ -1,0 +1,26 @@
+<package>
+  <name>surfr_urx</name>
+  <version>0.3.0</version>
+  <description>
+      Metapackage for Drivers, Models and utilities for Universal Robot manipulators.
+  </description>
+
+  <maintainer email="ebauzano@uma.es">Enrique Bauzano</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://medicalrobotics.uma.es</url>
+
+  <author email="ebauzano@uma.es">Enrique Bauzano</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>urx_driver</run_depend>
+  <run_depend>urx_description</run_depend>
+  <run_depend>ur3_moveit</run_depend>
+  <run_depend>ur5_moveit</run_depend>
+  <run_depend>ur10_moveit</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

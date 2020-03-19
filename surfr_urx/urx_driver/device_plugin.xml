@@ -1,0 +1,7 @@
+<library path="lib/libDeviceURx">
+  <class type="surfr::dev::DeviceURx" base_class_type="surfr::Base">
+  <description>
+    Universal Robots plugin for its corresponding Surgical Framework device.
+  </description>
+  </class>
+</library>

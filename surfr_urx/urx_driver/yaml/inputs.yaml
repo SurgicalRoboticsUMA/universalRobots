@@ -1,0 +1,13 @@
+# Valid types for inputs are:
+#   Boolean
+#   Unsigned
+#   Integer
+#   Double
+#   String
+#   Vector
+move_joints : "Joint"
+move_pose   : "Vector"
+speed_joints: "Joint"
+speed_pose  : "Vector"
+
+

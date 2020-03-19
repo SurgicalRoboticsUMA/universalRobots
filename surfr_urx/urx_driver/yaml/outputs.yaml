@@ -1,0 +1,18 @@
+# Valid types for outputs are:
+#   "Boolean"
+#   "Unsigned"
+#   "Integer"
+#   "Double"
+#   "String"
+#   "Vector"
+#   "Joint"
+state        : "Unsigned"
+digital_in   : "Unsigned"
+time_absolute: "Double"
+time_real    : "Double"
+pose         : "Vector"
+velocity     : "Vector"
+acceleration : "Vector"
+force        : "Vector"
+joints       : "Joint"
+

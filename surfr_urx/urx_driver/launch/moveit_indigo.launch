@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="simulation"         /> <!-- Use only the device simulation mode or both, simulator and real component  -->
+  <arg name="devid"              /> <!-- Represents the device model and id tag                                     -->
+  <arg name="origin_name"        /> <!-- Name of the device parent frame                                            -->
+  <arg name="origin_position"    /> <!-- Initial position of the root_link reference frame                          -->
+  <arg name="origin_orientation" /> <!-- Initial YPR (Euler XYZ) orientation of the root_link reference frame       -->
+  <arg name="tcp_position"       /> <!-- Adds a position offset for the Tool Center Point                           -->
+  <arg name="tcp_orientation"    /> <!-- Adds a orientation offset for the Tool Center Point                        -->
+
+<!-- MoveIt! for Universal Robots UR3 -->
+  <!-- Select the simulation or real mode -->
+  <param name="simulation" type="bool" value="$(arg simulation)" />
+  <!-- Load the Universal Robot Description Format (URDF) -->
+  <param name="urdf/model" command="$(find xacro)/xacro --inorder '$(find urx_driver)/urdf/ur3_robot.urdf.xacro' origin_name:='$(arg origin_name)' origin_position:='$(arg origin_position)' origin_orientation:='$(arg origin_orientation)' tcp_position:='$(arg tcp_position)' tcp_orientation:='$(arg tcp_orientation)' prefix:='$(arg devid)'"/>
+  <!-- Load the Semantic Robot Description Format (SRDF) -->
+  <param name="urdf/model_semantic" command="$(find xacro)/xacro --inorder '$(find urx_driver)/urdf/ur3.srdf' prefix:='$(arg devid)' origin:='$(arg origin_name)'"/>
+  <!-- Load updated joint limits (override information from URDF) -->
+  <rosparam ns="urdf/model_planning" command="load" file="$(find ur3_moveit)/config/joint_limits.yaml"/>
+  <!-- Load default settings for kinematics; these settings are overridden by settings in a node's namespace -->
+  <rosparam ns="urdf/model_kinematics/$(arg devid)_arm" command="load" file="$(find urx_driver)/yaml/kinematics.yaml"/>
+</launch>
