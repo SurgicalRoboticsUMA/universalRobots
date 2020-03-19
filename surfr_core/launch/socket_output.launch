@@ -1,0 +1,35 @@
+<launch>
+  <arg name="debug"    default="true"         doc="Use debug mode to output detailed runtime info. Valid values: {true|false}" />
+  <arg name="msg_type" default="std"          doc="Choose the topic message type between std_msgs and surfr_msgs packages. Valid values: {std|surfr}"/>
+  <arg name="ip"       default="192.168.1.10" doc="IP address to open channel communication."/>
+  <arg name="port"     default="30002"        doc="IP port to open channel communication."/>
+
+  <!-- ROS PARAMETERS INITIALIZATION -->
+  <env name="ROSCONSOLE_FORMAT"
+       value="[${severity}][${node}:${function}:${line}] [${time}]: ${message}" />
+  <env if="$(arg debug)"
+       name="ROSCONSOLE_CONFIG_FILE"
+       value="$(find surfr_core)/config/rosconsole_debug.config" />
+  <env unless="$(arg debug)"
+       name="ROSCONSOLE_CONFIG_FILE"
+       value="$(find surfr_core)/config/rosconsole_nodebug.config" />
+
+
+  <!-- IMPORTANT: The namespace of each node consists of the device model name followed by the '_'
+                  sign and the ID number which labels a particular device. -->
+
+  <!-- YAML Configuration parameters -->
+  <rosparam ns="Ethernet_1" command="load" file="$(find surfr_core)/yaml/Ethernet.yaml" />
+  <rosparam ns="Ethernet_1" subst_value="true">
+    debug     : $(arg debug)
+    msg_type  : $(arg msg_type)
+
+    ip        : '$(arg ip)'
+    port      : '$(arg port)'
+    mode      : 'output'
+  </rosparam>
+
+  <!-- Run Node -->
+  <node     if="$(arg debug)" name="Ethernet_1" pkg="surfr_core" type="comm_main" output="screen" args="--debug"   />
+  <node unless="$(arg debug)" name="Ethernet_1" pkg="surfr_core" type="comm_main" output="screen" args="--nodebug" />
+</launch>

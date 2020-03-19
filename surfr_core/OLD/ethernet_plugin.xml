@@ -1,0 +1,7 @@
+<library path="lib/libEthernet">
+  <class name="surfr/comm/Ethernet" type="surfr::comm::Ethernet" base_class_type="surfr::Base">
+  <description>
+    Ethernet socket plugin for Surgical Framework.
+  </description>
+  </class>
+</library>

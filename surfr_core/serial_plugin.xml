@@ -1,0 +1,7 @@
+<library path="lib/libSerial">
+  <class name="surfr/comm/Serial" type="surfr::comm::Serial" base_class_type="surfr::Base">
+  <description>
+    Serial Port plugin for Surgical Framework.
+  </description>
+  </class>
+</library>

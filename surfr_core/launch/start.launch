@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- YAML Configuration parameters -->
+  <rosparam ns="surfr" command="load" file="$(find surfr_core)/yaml/filters.yaml" />
+  <rosparam ns="surfr" command="load" file="$(find surfr_core)/yaml/planners.yaml" />
+</launch>

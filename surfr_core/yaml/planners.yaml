@@ -1,0 +1,15 @@
+planners:
+  Order1Linear:
+    tau: 0.025
+    max_velocity: 1.0
+    gain_control: 0.25
+  Order1Angular:
+    tau: 0.025
+    max_twist: 6.283185307179586
+    gain_control: 0.25
+  Order1Pose:
+    tau: 0.025
+    max_velocity: 1.0
+    max_twist: 6.283185307179586
+    gain_control: 0.25
+

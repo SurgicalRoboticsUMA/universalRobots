@@ -1,0 +1,7 @@
+<library path="lib/libsfNodelet">
+  <class name="surfr/Nodelet" type="surfr::Nodelet" base_class_type="nodelet::Nodelet">
+  <description>
+    Generic nodelet for its corresponding Surgical Framework node.
+  </description>
+  </class>
+</library>

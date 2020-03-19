@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>surfr_core</name>
+  <version>0.2.1</version>
+  <description>
+    This is the core package of the Surgical Framework (SurFr). It provides
+    dynamic libraries for several communication protocols, as well as an
+    inheritable class layer to convert standard C++ device drivers into
+    ROS/Orocos nodes. See documentation for more information related to the
+    standard format for programming a SurFr driver class.
+  </description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag --> 
+  <maintainer email="ebauzano@uma.es">Enrique Bauzano</maintainer>
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <license>TODO</license>
+
+
+  <!-- Url tags are optional, but mutiple are allowed, one per tag -->
+  <!-- Optional attribute type can be: website, bugtracker, or repository -->
+  <url type="website">http://medicalrobotics.uma.es</url>
+
+
+  <!-- Author tags are optional, mutiple are allowed, one per tag -->
+  <!-- Authors do not have to be maintianers, but could be -->
+  <author email="ebauzano@uma.es">Enrique Bauzano</author>
+
+
+  <!-- Dependencies can be catkin packages or system dependencies -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <!-- Packages needed at compile and/or run time -->
+  <depend>roscpp</depend>
+  <depend>rosconsole</depend>
+  <depend>roslib</depend>
+  <depend>rosbag</depend>
+  <depend>nodelet</depend>
+  <depend>pluginlib</depend>
+  <depend>cmake_modules</depend>
+  <depend>libntcan</depend>
+  <depend>libpcan</depend>
+  <depend>moveit_core</depend>
+  <depend>moveit_ros_planning_interface</depend>
+  <depend>surfr_msgs</depend>
+  <depend>cv_bridge</depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+    <nodelet    plugin="${prefix}/nodelet_plugin.xml" />
+    <surfr_core plugin="${prefix}/serial_plugin.xml" />
+    <surfr_core plugin="${prefix}/ethernet_plugin.xml" />
+  </export>
+</package>

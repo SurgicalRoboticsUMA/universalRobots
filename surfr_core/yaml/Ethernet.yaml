@@ -1,0 +1,17 @@
+# General information of this device: models available and working frequency
+models:
+  Ethernet:
+    description: "Ethernet communication via TCP/IP Protocol."
+frequency : 1000
+use_moveit: false
+
+inputs:
+  data: "String"
+
+outputs:
+  data: "String"
+
+services:
+  send_packet:
+    type   : "String"
+

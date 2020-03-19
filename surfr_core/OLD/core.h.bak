@@ -1,0 +1,298 @@
+/*
+ *
+ *  surfr_core/core.h
+ * 
+ *               Global definitions for Surgical Framework
+ *               ----------------------------------------------------------
+ *  Begin Date : September 14, 2016
+ *  Revision   : December 12, 2017 (rev 15)
+ *  Author     : Enrique Bauzano
+ *  Email      : ebauzano@uma.es
+ *               ----------------------------------------------------------
+ *  Done List  : - Split the source code from the header file. This allows
+ *                 the use of a unique library for the Core System (R15)
+ *               - New function to parse a string into a vector (R14)
+ *               - Message macros now are "streamed" (R13)
+ *               - Multiple updates (R4-R12)
+ *               - Move code to cpp file (R3)
+ *               - Addition of comments (R2)
+ *               - Customization of triggers by Hook() methods (R1)
+ *               ----------------------------------------------------------
+ *  Disclaimer : THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+ *               CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *               INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ *               MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *               DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ *               CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ *               SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *               BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *               SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *               INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ *               WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *               (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ *               OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *               POSSIBILITY OF SUCH DAMAGE.
+ *               ----------------------------------------------------------
+ */
+
+
+#if !defined(_SURFR_CORE_H)
+#define _SURFR_CORE_H
+
+#include <errno.h>                                // Standard error codes
+#include <iostream>                               // Standard C++ I/O stream (cin, cout)
+#include <sstream>                                // Standard C++ string stream
+#include <boost/bind.hpp>                         // Boost library bind method
+#include <boost/algorithm/string/predicate.hpp>   // Boost library string comparison non-case sensitive
+
+// #include "surfr_core/datatypes.h"                 // Surgical Frameworks flexible Data Types
+//***** NOTE: THESE HEADERS WILL BE INCLUDED INTO DATATYPES.H! *****
+#include <map>                                    // Standard C++ map class
+#include <string>                                 // Standard C++ string class
+#include <XmlRpcValue.h>                          // Generic value type of device params
+#include <boost/any.hpp>                          // Generic type of a parameter
+#include <Eigen/Eigen>                            // Maths with vectors and matrices
+//***** NOTE: THESE HEADERS WILL BE INCLUDED INTO DATATYPES.H! *****
+
+
+/// Macros
+// #define SURFR_DEBUG(msg)             IS_DEBUG ? (std::cout << "\033[32m["   << ISSUE_DESC.at(surfr::ISSUE_DEBUG)   << "][" << std::string(__FILE__).substr(std::string(__FILE__).rfind("/") + 1) << "::" << std::to_string(__LINE__) << "::" << std::string(__FUNCTION__) << "()] " << msg << "\033[0m\n") : (std::cout << "")
+// #define SURFR_INFO(msg)                          std::cout << "\033[37;1m[" << ISSUE_DESC.at(surfr::ISSUE_INFO)    << "][" << std::string(__FILE__).substr(std::string(__FILE__).rfind("/") + 1) << "::" << std::to_string(__LINE__) << "::" << std::string(__FUNCTION__) << "()] " << msg << "\033[0m\n"
+// #define SURFR_WARNING(msg)                       std::cout << "\033[33;1m[" << ISSUE_DESC.at(surfr::ISSUE_WARNING) << "][" << std::string(__FILE__).substr(std::string(__FILE__).rfind("/") + 1) << "::" << std::to_string(__LINE__) << "::" << std::string(__FUNCTION__) << "()] " << msg << "\033[0m\n"
+// #define SURFR_ERROR(msg)                         std::cout << "\033[31;1m[" << ISSUE_DESC.at(surfr::ISSUE_ERROR)   << "][" << std::string(__FILE__).substr(std::string(__FILE__).rfind("/") + 1) << "::" << std::to_string(__LINE__) << "::" << std::string(__FUNCTION__) << "()] " << msg << "\033[0m\n"
+// #define FLOW_CAST(data, type, param) boost::any_cast<type>((data)[param])
+#define SURFR_DEBUG(msg)             surfr::is_debug() ? (std::cout << "\033[32m[DEBUG]["     << std::string(__FILE__).substr(std::string(__FILE__).rfind("/") + 1) << "::" << std::to_string(__LINE__) << "::" << std::string(__FUNCTION__) << "()] " << msg << "\033[0m\n") : (std::cout << "")
+#define SURFR_INFO(msg)                                   std::cout << "\033[37;1m[INFO]["    << std::string(__FILE__).substr(std::string(__FILE__).rfind("/") + 1) << "::" << std::to_string(__LINE__) << "::" << std::string(__FUNCTION__) << "()] " << msg << "\033[0m\n"
+#define SURFR_WARNING(msg)                                std::cout << "\033[33;1m[WARNING][" << std::string(__FILE__).substr(std::string(__FILE__).rfind("/") + 1) << "::" << std::to_string(__LINE__) << "::" << std::string(__FUNCTION__) << "()] " << msg << "\033[0m\n"
+#define SURFR_ERROR(msg)                                  std::cout << "\033[31;1m[ERROR]["   << std::string(__FILE__).substr(std::string(__FILE__).rfind("/") + 1) << "::" << std::to_string(__LINE__) << "::" << std::string(__FUNCTION__) << "()] " << msg << "\033[0m\n"
+#define FLOW_CAST(data, type, param) boost::any_cast<type>((data)[param])
+
+#define DEFAULT_FREQUENCY 25
+
+namespace surfr {
+  /// Allows the use of << global overloads into ::surfr namespace
+  using ::operator<<;
+
+  /// Definition of variable types
+  typedef enum { ISSUE_NONE = 0,
+                 ISSUE_DEBUG,
+                 ISSUE_INFO,
+                 ISSUE_WARNING,
+                 ISSUE_ERROR
+  } Issue;
+  typedef std::map<std::string, boost::any>          Flow;
+  typedef std::map<std::string, XmlRpc::XmlRpcValue> Params;
+
+//   /// Global values
+//         bool                         IS_INIT           = false;
+//         bool                         IS_DEBUG          = false;
+//   /// Constant values (NOTE: use at() method for map access instead of [])
+//   const double                       DEFAULT_FREQUENCY = 25;
+//   const std::map<Issue, std::string> ISSUE_DESC        = { {ISSUE_DEBUG  , "DEBUG"  },
+//                                                            {ISSUE_INFO   , "INFO"   },
+//                                                            {ISSUE_WARNING, "WARNING"},
+//                                                            {ISSUE_ERROR  , "ERROR"  } };
+
+
+ /**
+  * List of valid arguments:
+  * --debug   Enables the debug mode (extra information on terminal)
+  * --nodebug Disables the debug mode (default option)
+  */
+  int init(int argc, char **argv);
+//   int init(int argc, char **argv) {
+//     for (int it = 0; it < argc; it++) {
+//       if (!std::string(argv[it]).compare("--debug")) {
+//         IS_DEBUG = true;
+//       }
+//       if (!std::string(argv[it]).compare("--nodebug")) {
+//         IS_DEBUG = false;
+//       }
+//       // std::cout << "." << argv[it] << "." << std::endl;
+//     }
+//     IS_INIT = true;
+//   };
+  int init(int argc, std::vector<std::string> argv);
+//   int init(int argc, std::vector<std::string> argv) {
+//     for (int it = 0; it < argc; it++) {
+//       if (!argv[it].compare("--debug")) {
+//         IS_DEBUG = true;
+//       }
+//       if (!argv[it].compare("--nodebug")) {
+//         IS_DEBUG = false;
+//       }
+//       // std::cout << "." << argv[it] << "." << std::endl;
+//     }
+//     IS_INIT = true;
+//   };
+
+bool is_debug();
+bool is_init();
+
+  // Return all parameters within path namespace of a yaml file data into list variable 
+void parse_yaml(Params& list, XmlRpc::XmlRpcValue& yaml, const std::string& path, const std::string& model) {
+  if (yaml.getType() == XmlRpc::XmlRpcValue::TypeStruct) {
+    for(surfr::Params::iterator it = yaml.begin(); it != yaml.end(); it++) {
+      if (path.compare("/models") || !it->first.compare(model)) {
+        parse_yaml(list, it->second, path + "/" + it->first, model);
+      }
+    }
+  } else {
+    list[path.substr(1)] = yaml;
+    SURFR_DEBUG(path << ": " << yaml);
+  }
+};
+
+
+  // Return all elements separated by spaces within a std::string into a std::vector
+template <class T>
+std::vector<T> parse_string(const std::string str) {
+  T                 val;
+  std::vector<T>    ret;
+  std::stringstream ss(str);
+  while (ss >> val) {
+    ret.push_back(val);
+  }
+  return ret;
+};
+  
+
+  /// Overload of << operator to allow Params type
+  std::ostream& operator<<(std::ostream &stream, const Params& p);
+//   std::ostream& operator<<(std::ostream &stream, const Params& p) {
+//     XmlRpc::XmlRpcValue value;
+    
+//     for (Params::const_iterator it = p.begin(); it != p.end(); it++) {
+//       value = (XmlRpc::XmlRpcValue) it->second;
+//       switch (value.getType()) {
+//         case XmlRpc::XmlRpcValue::TypeBoolean:
+//           stream << it->first << ": " << bool(value) << std::endl;
+//         break;
+//         case XmlRpc::XmlRpcValue::TypeInt:
+//           stream << it->first << ": " << int(value) << std::endl;
+//         break;
+//         case XmlRpc::XmlRpcValue::TypeDouble:
+//           stream << it->first << ": " << double(value) << std::endl;
+//         break;
+//         case XmlRpc::XmlRpcValue::TypeString:
+//           stream << it->first << ": " << std::string(value) << std::endl;
+//         break;
+//         case XmlRpc::XmlRpcValue::TypeArray:
+//           stream << it->first << ": {";
+//           for (int itArray = 0; itArray < value.size(); itArray++) {
+//             stream << std::string(value[itArray]);
+//             if (itArray != value.size() - 1)
+//               stream << ", ";
+//           }
+//           stream << "}" << std::endl;
+//         break;
+//         default:
+//           stream << it->first << ": [Non-Defined value type]" << std::endl;
+//         break;
+//       }
+//     }
+
+//     return stream;
+//   }
+  
+  /*! \brief Conversion from a 2-byte array to an integer value.
+   *
+   *  \param b is an array string with the integer value in ascii code.
+   *  \sa bytes2double()
+   */
+  int bytes2int(char * b);
+//   int bytes2int(char * b) {
+//     int conv = 0;
+
+//     for (int k = 0, pow = 1; k < sizeof(int); k++, pow *= 256) {
+//       conv += (*(b + (sizeof(int)-1) - k))*pow;
+//     }
+
+//     return conv;
+//   }
+
+  /*! \brief Conversion from a 4-byte array to a double value.
+   *
+   *  \param b is an array string with the double value in ascii code.
+   *  \sa bytes2int()
+   */
+  double bytes2double(char * b);
+  // double bytes2double(char * b) {
+//     union {
+//       double d;
+//       char b[sizeof(double)];
+//     } conv;
+
+//     for (int k = 0; k < sizeof(double); k++) {
+//       conv.b[(sizeof(double)-1)-k] = *(b + k);
+//     }
+
+//     return conv.d;
+//   }
+
+
+  /*! \brief Conversion from a XmlRpcValue array to a vector array.
+   *
+   *  VERY IMPORTANT: This function assumes that the type T of each element
+   *                  inside the vector array is the same as the values
+   *                  stores into the XmlRpcValue array. If they are not
+   *                  compatible the function will fail.
+   *  \param x is the original XmlRpcValue array .
+   *  \param v is the vector variable which stores the converted values.
+   *  \sa vector2XmlRpcArray()
+   */
+  template <class T>
+  void XmlRpcArray2vector(XmlRpc::XmlRpcValue& x, std::vector<T>& v);
+//   template <class T>
+//   void XmlRpcArray2vector(XmlRpc::XmlRpcValue& x, std::vector<T>& v) {
+//     // Check that the XmlRpcValue is an array
+//     if (x.getType() == XmlRpc::XmlRpcValue::Type::TypeArray) {
+//       v.clear();
+//       for (unsigned int k = 0; k < x.size(); k++) {
+//         v.push_back(T(x[k]));
+//       }
+//     }
+//   }
+
+  /*! \brief Conversion from a vector array to a XmlRpcValue array.
+   *
+   *  VERY IMPORTANT: This function assumes that the type T of each element
+   *                  inside the vector array is the same as the values
+   *                  stored into the XmlRpcValue array. If they are not
+   *                  compatible the function will fail.
+   *  \param v is the original vector array .
+   *  \param x is the XmlRpcValue variable which stores the converted values.
+   *  \sa XmlRpcArray2vector()
+   */
+  template <class T>
+  void vector2XmlRpcArray(std::vector<T>& v, XmlRpc::XmlRpcValue& x);
+//   template <class T>
+//   void vector2XmlRpcArray(std::vector<T>& v, XmlRpc::XmlRpcValue& x) {
+//     // Check that the vector value is not empty
+//     if (!v.empty()) {
+//       x.clear();
+//       x.setSize(v.size());
+//       for (unsigned int k = 0; k < v.size(); k++) {
+//         x[k] = v[k];
+//       }
+//     }
+//   }
+
+} // namespace surfr
+
+/// Overload of << operator to allow std::vector<T> templated-type
+template <class T>
+std::ostream& operator<<(std::ostream &stream, const std::vector<T>& v) {
+  stream << "[";
+  for (int it = 0; it < v.size(); it++) {
+    stream << v[it];
+    if (it < v.size() - 1) {
+      stream << ", ";
+    } else {
+      stream << "]";
+    }
+  }
+  return stream;
+}
+
+#endif  //_SURFR_CORE_H
