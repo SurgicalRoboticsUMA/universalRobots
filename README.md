@@ -7,6 +7,7 @@
 ```bash
 sudo apt-get install ros-kinetic-moveit
 ```
+* Package *libntcan*: dowload from (http://wiki.ros.org/libntcan).
 
 ## To build
 Download the package (https://github.com/SurgicalRoboticsUMA/universalRobots.git) and copy it into folder /catkin_ws/src. Then:
