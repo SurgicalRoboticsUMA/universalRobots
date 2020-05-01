@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch><!-- NOTE: MUST CREATE A LAUNCH FILE FOR EACH ROBOT (UR3, UR5, UR10) -->
+   <arg default="172.16.48.129" name="ip"/> <!-- IP address to open channel communication. Disabled on simulation mode      -->
+   <arg default="true" name="urdf"/> <!-- Visualize virtual environment. Valid values: {true|false}.                 -->
+   <arg default="0.0 0.0 0.0" name="tcp_position"/> <!-- Adds a position offset for the Tool Center Point                           -->
+   <arg default="0.0 0.0 0.0" name="tcp_orientation"/> <!-- Adds a orientation offset for the Tool Center Point                        -->
+
    <arg default="false" name="distro_legacy"/> <!-- Execution will consider an legacy version of ROS (hydro or older)          -->
    <arg default="std" name="msg_type"/> <!-- Choose between std_msgs and surfr_msgs packages. Valid values: {std|surfr} -->
    <arg default="false" name="debug"/> <!-- Use debug mode to output detailed runtime info. Valid values: {true|false} -->
-   <arg default="true" name="urdf"/> <!-- Visualize virtual environment. Valid values: {true|false}.                 -->
    <arg default="false" name="simulation"/> <!-- Use only the device simulation mode or both, simulator and real component  -->
    <arg default="1" name="id"/> <!-- Device ID number                                                           -->
    <arg default="world" name="origin_name"/> <!-- Name of the device parent frame                                            -->
-   <arg default="0.24179    0.070729   -0.058494" name="origin_position"/> <!-- Initial position of the root_link reference frame                          -->
-   <arg default="0           0    -0.78541" name="origin_orientation"/> <!-- Initial YPR (Euler XYZ) orientation of the root_link reference frame       -->
-   <arg default="0.0 0.0 0.246" name="tcp_position"/> <!-- Adds a position offset for the Tool Center Point                           -->
-   <arg default="0.0 0.0 0.0" name="tcp_orientation"/> <!-- Adds a orientation offset for the Tool Center Point                        -->
-   <arg default="172.16.48.129" name="ip"/> <!-- IP address to open channel communication. Disabled on simulation mode      -->
+   <arg default="0 0 0" name="origin_position"/> <!-- Initial position of the root_link reference frame                          -->
+   <arg default="0           0    0" name="origin_orientation"/> <!-- Initial YPR (Euler XYZ) orientation of the root_link reference frame       -->
+
    <arg default="3.5" name="polyscope_version"/> <!-- Valid values: 3.0 (for 3.0-3.1); 3.2 (for 3.2-3.4) or 3.5 (for 3.5-3.8)    --><!-- IMPORTANT: The namespace of each node consists of the device model name followed by the '_'
                   sign and the ID number which labels a particular device. -->
    <arg name="devid" value="UR3_$(arg id)"/> <!-- For internal use, represents the device model and id tag                   --><!-- ROS PARAMETERS INITIALIZATION -->
@@ -62,3 +64,4 @@
       <remap from="joint_states" to="$(arg devid)/inputs/move_joints"/>
    </node><!--  <rosparam ns="$(arg devid)/planners" command="load" file="$(find urx_driver)/yaml$(env ROS_DISTRO)/planners.yaml" />-->
 </launch>
+
